@@ -23,6 +23,7 @@ function App() {
 
   const [play, setPlay] = useState(initPlay);
   const [flashColor, setFlashColor] = useState("");
+  const [maxScore, setMaxScore] = useState(0);
 
   function startHandle() {
     setIsOn(true);
@@ -55,10 +56,10 @@ function App() {
     // Delay before first color is displayed
     await timeout(1000);
     for (let i = 0; i < play.colors.length; i++) {
+      await timeout(500);
       setFlashColor(play.colors[i]);
-      await timeout(1000);
+      await timeout(500);
       setFlashColor("");
-      await timeout(1000);
 
       if (i === play.colors.length - 1) {
         const copyColors = [...play.colors];
@@ -82,20 +83,25 @@ function App() {
         if (copyUserColors.length) {
           setPlay({ ...play, userColors: copyUserColors });
         } else {
-          await timeout(1000);
           setPlay({
             ...play,
             isDisplay: true,
             userPlay: false,
             score: play.colors.length,
             userColors: [],
+            max: play.colors.length,
           });
         }
       } else {
-        await timeout(1000);
-        setPlay({ ...initPlay, score: play.colors.length });
+        await timeout(500);
+        setMaxScore(Math.max(play.colors.length, maxScore));
+        console.log(maxScore);
+        setPlay({
+          ...initPlay,
+          score: play.colors.length,
+        });
       }
-      await timeout(1000);
+      await timeout(500);
       setFlashColor("");
     }
   }
@@ -106,24 +112,33 @@ function App() {
 
   return (
     <div className="h-full m-0 flex bg-slate-700 justify-center items-center">
-      <div className="flex flex-wrap justify-center m-auto w-96">
-        {colorList &&
-          colorList.map((v, i) => (
-            <ColorCard
-              onClick={() => cardClickHandle(v)}
-              flash={flashColor === v}
-              color={v}
-            ></ColorCard>
-          ))}
+      <div className="flex flex-col">
+        {/* Highest Score */}
+        <h1 className="text-center">Highest Score: {maxScore}</h1>
+        {/* Color Tiles */}
+        <div className="flex flex-wrap justify-center m-auto w-96">
+          {colorList &&
+            colorList.map((v, i) => (
+              <ColorCard
+                onClick={() => cardClickHandle(v)}
+                flash={flashColor === v}
+                color={v}
+              ></ColorCard>
+            ))}
+        </div>
       </div>
+
+      {/* Start button */}
       {!isOn && !play.score && (
         <button
           onClick={startHandle}
           className="absolute bg-slate-700 h-32 w-32 rounded-full text-2xl"
         >
-          START
+          PLAY
         </button>
       )}
+
+      {/* Game score */}
       {isOn && (play.isDisplay || play.userPlay) && (
         <button
           onClick={startHandle}
@@ -132,6 +147,8 @@ function App() {
           {play.score}
         </button>
       )}
+
+      {/* Final Score and Play again button */}
       {isOn && !play.isDisplay && !play.userPlay && play.score && (
         <div className="absolute bg-slate-700 h-32 w-32 rounded-xl text-2xl text-center pt-2">
           <div>Score: {play.score}</div>

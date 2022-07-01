@@ -4,6 +4,8 @@
 
 A simple implementation of the game Simon Says in React.
 
+![Simon Says demo image](simon-says-demo.png)
+
 ## References
 
 - [Simon Says Game in React](https://youtu.be/EGRAKMNkyFg)
